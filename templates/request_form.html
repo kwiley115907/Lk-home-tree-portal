@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}New Request{% endblock %}
+
+{% block content %}
+<h2>Create Service Request</h2>
+
+<form method="POST" action="{{ url_for('submit_request') }}">
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea name="description" class="form-control" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Estimated Hours</label>
+        <input type="number" name="hours" class="form-control" step="0.1" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Hourly Rate ($)</label>
+        <input type="number" name="rate" class="form-control" step="0.01" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Submit</button>
+</form>
+{% endblock %}

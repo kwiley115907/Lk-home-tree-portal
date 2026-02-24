@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2>All Service Requests</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for request in requests %}
+    <tr>
+        <td>{{ request.id }}</td>
+        <td>{{ request.description }}</td>
+        <td>
+            {% if request.completed %}
+               <a href="{{ url_for('download_invoice', request_id=request.id) }}" class="btn btn-sm btn-success">
+                   Download Invoice
+               </a>
+            {% else %}
+               <a href="{{ url_for('generate', request_id=request.id) }}" class="btn btn-sm btn-primary">
+                   Generate Invoice
+               </a>
+            {% endif %}
+        </td>
+        <td>
+            {% if not request.completed %}
+                <a href="/generate/{{ request.id }}">
+                    Generate Invoice
+                </a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/logout">Logout</a>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<h2>Submit Service Request</h2>
+
+<form method="POST" action="/submit">
+    <textarea name="description" rows="5" cols="40" required></textarea><br><br>
+    <button type="submit">Submit Request</button>
+</form>
+<hr>
+<h4>Your Requests</h4>
+
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Invoice</th>
+    </tr>
+
+    {% for request in requests %}
+    <tr>
+        <td>{{ request.id }}</td>
+        <td>
+            {% if request.completed %}
+                Completed
+            {% else %}
+                Pending
+            {% endif %}
+        </td>
+        <td>
+            {% if request.invoice_file %}
+                <a href="{{ url_for('download_invoice', request_id=request.id) }}">
+                    Download
+                </a>
+            {% else %}
+                —
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+<a href="/logout">Logout</a>
+{% endblock %}
