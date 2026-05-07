@@ -1,7 +1,7 @@
 services:
   - type: web
-    name: lk-home-tree
+    name: lk-home-tree-portal
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn run:app"
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
     plan: free
