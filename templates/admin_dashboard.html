@@ -1,44 +1,80 @@
 {% extends "base.html" %}
-
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<h2>All Service Requests</h2>
+<div class="contractor-card">
+    <h2>Service Requests</h2>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Description</th>
-        <th>Status</th>
-        <th>Action</th>
-    </tr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for request in requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.description }}</td>
+                <td>{{ request.status }}</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="{{ url_for('update_status', request_id=request.id, new_status='In Progress') }}">
+                        In Progress
+                    </a>
+                    <a class="btn btn-sm btn-success"
+                       href="{{ url_for('update_status', request_id=request.id, new_status='Completed') }}">
+                        Completed
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No service requests.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-    {% for request in requests %}
-    <tr>
-        <td>{{ request.id }}</td>
-        <td>{{ request.description }}</td>
-        <td>
-            {% if request.completed %}
-               <a href="{{ url_for('download_invoice', request_id=request.id) }}" class="btn btn-sm btn-success">
-                   Download Invoice
-               </a>
-            {% else %}
-               <a href="{{ url_for('generate', request_id=request.id) }}" class="btn btn-sm btn-primary">
-                   Generate Invoice
-               </a>
-            {% endif %}
-        </td>
-        <td>
-            {% if not request.completed %}
-                <a href="/generate/{{ request.id }}">
-                    Generate Invoice
-                </a>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="contractor-card mt-4">
+    <h2>Recent Invoices</h2>
 
-<br>
-<a href="/logout">Logout</a>
+    <a href="{{ url_for('create_invoice') }}" class="btn btn-primary mb-3">
+        Create Invoice
+    </a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Open</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.invoice_number }}</td>
+                <td>{{ invoice.client_name }}</td>
+                <td>{{ "Paid" if invoice.is_paid else "Unpaid" }}</td>
+                <td>
+                    <a class="btn btn-sm btn-primary"
+                       href="{{ url_for('edit_invoice', invoice_id=invoice.id) }}">
+                        Open
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No invoices yet.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

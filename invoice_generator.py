@@ -1,102 +1,119 @@
-# invoice_generator.py
-
 import os
 from datetime import datetime
-from reportlab.lib import colors
+
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    Image,
-)
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import inch
-
-from models import ServiceRequest
+from reportlab.pdfgen import canvas
 
 
-def generate_invoice(request: ServiceRequest) -> str:
-    """
-    Generate a professional styled PDF invoice.
+COMPANY_NAME = "LK Home & Tree Co."
+COMPANY_ADDRESS = [
+    "3938 Surfside Blvd.",
+    "Unit 3211",
+    "Corpus Christi, TX 78402",
+]
 
-    :param request: ServiceRequest instance
-    :return: Path to generated PDF file
-    """
 
+def generate_invoice_pdf(invoice) -> str:
     os.makedirs("invoices", exist_ok=True)
 
-    filename = f"invoices/invoice_{request.id}.pdf"
-    doc = SimpleDocTemplate(filename, pagesize=A4)
+    filename = f"invoices/{invoice.invoice_number}.pdf"
 
-    elements = []
-    styles = getSampleStyleSheet()
+    pdf = canvas.Canvas(filename, pagesize=A4)
+    width, height = A4
+    y = height - 50
 
-    # --- Logo ---
     logo_path = "static/images/logo.png"
+
     if os.path.exists(logo_path):
-        logo = Image(logo_path, width=2 * inch, height=1 * inch)
-        elements.append(logo)
+        pdf.drawImage(
+            logo_path,
+            40,
+            y - 45,
+            width=90,
+            height=60,
+            preserveAspectRatio=True,
+            mask="auto",
+        )
 
-    elements.append(Spacer(1, 12))
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(150, y, COMPANY_NAME)
+    y -= 20
 
-    # --- Company Info ---
-    elements.append(Paragraph("<b>LK Home & Tree Co.</b>", styles["Title"]))
-    elements.append(Paragraph("Professional Tree & Home Services", styles["Normal"]))
-    elements.append(Spacer(1, 12))
+    pdf.setFont("Helvetica", 10)
+    for line in COMPANY_ADDRESS:
+        pdf.drawString(150, y, line)
+        y -= 13
 
-    # --- Invoice Info ---
-    elements.append(Paragraph(f"Invoice #: {request.id}", styles["Normal"]))
-    elements.append(Paragraph(f"Date: {datetime.utcnow().date()}", styles["Normal"]))
-    elements.append(Spacer(1, 20))
+    y -= 25
 
-    # --- Customer Info ---
-    elements.append(Paragraph("<b>Billed To:</b>", styles["Heading3"]))
-    elements.append(Paragraph(request.user.email, styles["Normal"]))
-    elements.append(Spacer(1, 20))
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(40, y, "INVOICE")
+    y -= 22
 
-    # --- Pricing Table ---
-    subtotal = request.hours * request.rate
-    tax = subtotal * 0.07  # 7% tax (adjust if needed)
+    pdf.setFont("Helvetica", 11)
+    pdf.drawString(40, y, f"Invoice #: {invoice.invoice_number}")
+    y -= 16
+    pdf.drawString(40, y, f"Date: {datetime.now().strftime('%Y-%m-%d')}")
+    y -= 16
+    pdf.drawString(40, y, f"Client: {invoice.client_name}")
+
+    if invoice.client_email:
+        y -= 16
+        pdf.drawString(40, y, f"Email: {invoice.client_email}")
+
+    y -= 35
+
+    col_desc = 40
+    col_qty = 320
+    col_rate = 380
+    col_amount = 465
+
+    pdf.setFont("Helvetica-Bold", 11)
+    pdf.drawString(col_desc, y, "Description")
+    pdf.drawString(col_qty, y, "Qty")
+    pdf.drawString(col_rate, y, "Rate")
+    pdf.drawString(col_amount, y, "Amount")
+
+    y -= 10
+    pdf.line(40, y, width - 40, y)
+    y -= 22
+
+    subtotal = 0.0
+
+    pdf.setFont("Helvetica", 10)
+
+    for item in invoice.items:
+        amount = item.quantity * item.rate
+        subtotal += amount
+
+        pdf.drawString(col_desc, y, item.description[:45])
+        pdf.drawString(col_qty, y, f"{item.quantity:g}")
+        pdf.drawString(col_rate, y, f"${item.rate:.2f}")
+        pdf.drawString(col_amount, y, f"${amount:.2f}")
+
+        y -= 20
+
+        if y < 120:
+            pdf.showPage()
+            y = height - 50
+
+    y -= 15
+
+    tax = subtotal * invoice.tax_rate
     total = subtotal + tax
 
-    data = [
-        ["Description", "Hours", "Rate", "Amount"],
-        [
-            request.description,
-            f"{request.hours}",
-            f"${request.rate:.2f}",
-            f"${subtotal:.2f}",
-        ],
-        ["", "", "Tax (7%)", f"${tax:.2f}"],
-        ["", "", "<b>Total</b>", f"<b>${total:.2f}</b>"],
-    ]
+    pdf.setFont("Helvetica", 11)
+    pdf.drawRightString(width - 40, y, f"Subtotal: ${subtotal:.2f}")
+    y -= 18
+    pdf.drawRightString(width - 40, y, f"Tax ({invoice.tax_rate * 100:.0f}%): ${tax:.2f}")
+    y -= 20
 
-    table = Table(data, colWidths=[3 * inch, 1 * inch, 1 * inch, 1 * inch])
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ]
-        )
-    )
+    pdf.setFont("Helvetica-Bold", 13)
+    pdf.drawRightString(width - 40, y, f"Total: ${total:.2f}")
 
-    elements.append(table)
-    elements.append(Spacer(1, 30))
+    y -= 45
+    pdf.setFont("Helvetica", 10)
+    pdf.drawString(40, y, "Thank you for your business!")
 
-    elements.append(
-        Paragraph("Thank you for your business!", styles["Normal"])
-    )
-
-    doc.build(elements)
-
-    request.invoice_file = filename
-    request.completed = True
-
+    pdf.save()
     return filename

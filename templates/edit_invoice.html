@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Edit Invoice{% endblock %}
+
+{% block content %}
+<div class="contractor-card">
+    <h2>{{ invoice.invoice_number }}</h2>
+
+    <p><strong>Client:</strong> {{ invoice.client_name }}</p>
+    <p><strong>Email:</strong> {{ invoice.client_email or "N/A" }}</p>
+
+    <p>
+        <strong>Status:</strong>
+        {% if invoice.is_paid %}
+            <span class="badge bg-success">Paid</span>
+        {% else %}
+            <span class="badge bg-danger">Unpaid</span>
+        {% endif %}
+
+        <a href="{{ url_for('toggle_paid', invoice_id=invoice.id) }}"
+           class="btn btn-sm btn-outline-light ms-2">
+            Toggle Paid
+        </a>
+    </p>
+
+    <hr>
+
+    <h4>Add Line Item</h4>
+
+    <form method="POST" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <input type="text" name="description" placeholder="Description"
+                   class="form-control" required>
+        </div>
+
+        <div class="col-md-2">
+            <input type="number" step="0.1" name="quantity" placeholder="Qty"
+                   class="form-control" required>
+        </div>
+
+        <div class="col-md-2">
+            <input type="number" step="0.01" name="rate" placeholder="Rate"
+                   class="form-control" required>
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-success w-100">Add</button>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in invoice.items %}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ "%.2f"|format(item.rate) }}</td>
+                <td>${{ "%.2f"|format(item.quantity * item.rate) }}</td>
+                <td>
+                    <a href="{{ url_for('delete_item', item_id=item.id) }}"
+                       class="btn btn-sm btn-danger">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">No line items yet.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('generate_invoice_pdf_route', invoice_id=invoice.id) }}"
+       class="btn btn-primary">
+        Generate PDF
+    </a>
+</div>
+{% endblock %}

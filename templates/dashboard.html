@@ -1,46 +1,44 @@
 {% extends "base.html" %}
-
 {% block title %}Customer Dashboard{% endblock %}
 
 {% block content %}
-<h2>Submit Service Request</h2>
+<div class="contractor-card">
+    <h2>Submit Service Request</h2>
 
-<form method="POST" action="/submit">
-    <textarea name="description" rows="5" cols="40" required></textarea><br><br>
-    <button type="submit">Submit Request</button>
-</form>
-<hr>
-<h4>Your Requests</h4>
+    <form method="POST" action="{{ url_for('submit_request') }}">
+        <div class="mb-3">
+            <label>Describe what you need done</label>
+            <textarea name="description" class="form-control" rows="5" required></textarea>
+        </div>
 
-<table class="table">
-    <tr>
-        <th>ID</th>
-        <th>Status</th>
-        <th>Invoice</th>
-    </tr>
+        <button type="submit" class="btn btn-primary">Submit Request</button>
+    </form>
+</div>
 
-    {% for request in requests %}
-    <tr>
-        <td>{{ request.id }}</td>
-        <td>
-            {% if request.completed %}
-                Completed
-            {% else %}
-                Pending
-            {% endif %}
-        </td>
-        <td>
-            {% if request.invoice_file %}
-                <a href="{{ url_for('download_invoice', request_id=request.id) }}">
-                    Download
-                </a>
-            {% else %}
-                —
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-<br>
-<a href="/logout">Logout</a>
+<div class="contractor-card mt-4">
+    <h3>Your Requests</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for request in requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.description }}</td>
+                <td>{{ request.status }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">No requests yet.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

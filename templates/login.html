@@ -1,17 +1,26 @@
 {% extends "base.html" %}
-
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<h2>Login</h2>
+<div class="contractor-card mx-auto" style="max-width: 500px;">
+    <h2 class="mb-4">Login</h2>
 
-<form method="POST">
-    <label>Email:</label><br>
-    <input type="email" name="email" required><br><br>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
 
-    <label>Password:</label><br>
-    <input type="password" name="password" required><br><br>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
 
-    <button type="submit">Login</button>
-</form>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+
+    <div class="mt-3 text-center">
+        <a href="{{ url_for('register') }}">Need an account? Register</a>
+    </div>
+</div>
 {% endblock %}
