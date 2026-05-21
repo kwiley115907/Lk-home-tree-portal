@@ -597,8 +597,48 @@ def gallery():
         },
         {
             "title": "Palm Trim",
-            "before": "gallery/before/job3.jpg",
-            "after": "gallery/after/job3.jpg",
+            "before": "gallery/before/job4.jpg",
+            "after": "gallery/after/job4.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job5.jpg",
+            "after": "gallery/after/job5.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job6.jpg",
+            "after": "gallery/after/job6.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job7.jpg",
+            "after": "gallery/after/job7.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job8.jpg",
+            "after": "gallery/after/job8.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job9.jpg",
+            "after": "gallery/after/job9.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job10.jpg",
+            "after": "gallery/after/job10.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job11.jpg",
+            "after": "gallery/after/job11.jpg",
+        },
+        {
+            "title": "Palm Trim",
+            "before": "gallery/before/job12.jpg",
+            "after": "gallery/after/job12.jpg",
         },
     ]
 
