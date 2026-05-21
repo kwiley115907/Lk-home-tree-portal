@@ -4,6 +4,7 @@
 {% block content %}
 <div class="contractor-card">
     <h2>Submit Service Request</h2>
+<a href="{{ url_for('customer_invoices') }}" class="btn btn-primary mb-3">My Invoices</a>
 
     <form method="POST" action="{{ url_for('submit_request') }}">
         <div class="mb-3">
@@ -23,7 +24,7 @@
             <tr>
                 <th>ID</th>
                 <th>Description</th>
-                <th>Status</th>
+                <th>Status</th><th>Photo</th>
             </tr>
         </thead>
         <tbody>
@@ -32,10 +33,18 @@
                 <td>{{ request.id }}</td>
                 <td>{{ request.description }}</td>
                 <td>{{ request.status }}</td>
+                <td>
+                    <form method="POST"
+                          action="{{ url_for('upload_photo', request_id=request.id) }}"
+                          enctype="multipart/form-data">
+                        <input type="file" name="photo" class="form-control form-control-sm mb-1">
+                        <button class="btn btn-sm btn-primary">Upload Photo</button>
+                    </form>
+                </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">No requests yet.</td>
+                <td colspan="4">No requests yet.</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<div class="contractor-card">
+    <h2>Admin Analytics</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="contractor-card">
+                <h5>Total Invoices</h5>
+                <h2>{{ invoices|length }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="contractor-card">
+                <h5>Revenue</h5>
+                <h2>${{ "%.2f"|format(revenue) }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="contractor-card">
+                <h5>Unpaid</h5>
+                <h2>${{ "%.2f"|format(unpaid_total) }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="contractor-card">
+                <h5>Requests</h5>
+                <h2>{{ requests_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

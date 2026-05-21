@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}My Invoices{% endblock %}
+
+{% block content %}
+<div class="contractor-card">
+    <h2>My Invoices</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Status</th>
+                <th>Pay</th>
+                <th>Sign</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.invoice_number }}</td>
+                <td>{{ invoice.payment_status }}</td>
+                <td>
+                    {% if not invoice.is_paid %}
+                        <a href="{{ url_for('pay_invoice', invoice_id=invoice.id) }}"
+                           class="btn btn-primary btn-sm">
+                            Pay
+                        </a>
+                    {% else %}
+                        Paid
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('sign_invoice', invoice_id=invoice.id) }}"
+                       class="btn btn-outline-light btn-sm">
+                        Sign
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No invoices yet.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

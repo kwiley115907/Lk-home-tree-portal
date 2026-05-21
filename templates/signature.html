@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Sign Invoice{% endblock %}
+
+{% block content %}
+<div class="contractor-card">
+    <h2>Sign {{ invoice.invoice_number }}</h2>
+
+    <canvas id="signature-pad"
+            width="600"
+            height="250"
+            style="background:white; border:2px solid #facc15; width:100%;">
+    </canvas>
+
+    <form method="POST" id="signature-form">
+        <input type="hidden" name="signature_data" id="signature_data">
+
+        <button type="button" class="btn btn-secondary mt-3" onclick="clearPad()">
+            Clear
+        </button>
+
+        <button type="submit" class="btn btn-primary mt-3">
+            Save Signature
+        </button>
+    </form>
+</div>
+
+<script>
+const canvas = document.getElementById("signature-pad");
+const ctx = canvas.getContext("2d");
+let drawing = false;
+
+function getPos(event) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = event.touches ? event.touches[0] : event;
+
+    return {
+        x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+        y: (touch.clientY - rect.top) * (canvas.height / rect.height),
+    };
+}
+
+function start(event) {
+    drawing = true;
+    const pos = getPos(event);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    event.preventDefault();
+}
+
+function draw(event) {
+    if (!drawing) return;
+    const pos = getPos(event);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    event.preventDefault();
+}
+
+function stop() {
+    drawing = false;
+}
+
+function clearPad() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+canvas.addEventListener("mousedown", start);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stop);
+canvas.addEventListener("mouseleave", stop);
+
+canvas.addEventListener("touchstart", start);
+canvas.addEventListener("touchmove", draw);
+canvas.addEventListener("touchend", stop);
+
+document.getElementById("signature-form").addEventListener("submit", function () {
+    document.getElementById("signature_data").value = canvas.toDataURL("image/png");
+});
+</script>
+{% endblock %}

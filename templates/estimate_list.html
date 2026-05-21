@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Estimates{% endblock %}
+
+{% block content %}
+<div class="contractor-card">
+    <h2>Estimates</h2>
+
+    <a href="{{ url_for('create_estimate') }}" class="btn btn-primary mb-3">
+        New Estimate
+    </a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Convert</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for estimate in estimates %}
+            <tr>
+                <td>{{ estimate.client_name }}</td>
+                <td>${{ "%.2f"|format(estimate.estimated_total) }}</td>
+                <td>{{ "Accepted" if estimate.accepted else "Open" }}</td>
+                <td>
+                    {% if not estimate.accepted %}
+                        <a href="{{ url_for('convert_estimate', estimate_id=estimate.id) }}"
+                           class="btn btn-success btn-sm">
+                            Convert
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No estimates.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -182,6 +182,16 @@
                            class="btn btn-outline-light btn-sm me-2">
                             Invoices
                         </a>
+
+                        <a href="{{ url_for('estimate_list') }}"
+                           class="btn btn-outline-light btn-sm me-2">
+                            Estimates
+                        </a>
+
+                        <a href="{{ url_for('analytics') }}"
+                           class="btn btn-outline-light btn-sm me-2">
+                            Analytics
+                        </a>
                     {% endif %}
 
                     <a href="{{ url_for('logout') }}"

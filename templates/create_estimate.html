@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Create Estimate{% endblock %}
+
+{% block content %}
+<div class="contractor-card mx-auto" style="max-width: 650px;">
+    <h2>Create Estimate</h2>
+
+    <form method="POST">
+        <input name="client_name" class="form-control mb-3" placeholder="Client Name" required>
+        <input name="client_email" type="email" class="form-control mb-3" placeholder="Client Email">
+        <input name="client_phone" class="form-control mb-3" placeholder="Client Phone">
+        <textarea name="description" class="form-control mb-3" placeholder="Estimate Description" required></textarea>
+        <input name="estimated_total" type="number" step="0.01" class="form-control mb-3" placeholder="Estimated Total" required>
+
+        <button class="btn btn-primary w-100">Create Estimate</button>
+    </form>
+</div>
+{% endblock %}

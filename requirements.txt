@@ -4,3 +4,5 @@ Flask-SQLAlchemy
 Werkzeug
 reportlab
 gunicorn
+stripe
+twilio
