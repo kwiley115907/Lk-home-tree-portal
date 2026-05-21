@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="contractor-card mx-auto" style="max-width: 700px;">
+    <h1 class="mb-4">Contact Us</h1>
+
+    <div class="mb-4">
+        <h5>LK Tree Services</h5>
+
+        <p>
+            3938 Surfside Blvd Unit 3211<br>
+            Corpus Christi, TX 78402
+        </p>
+
+        <p>
+            Email: lkhometreeco@gmail.com
+        </p>
+    </div>
+
+    <form>
+        <input type="text"
+               class="form-control mb-3"
+               placeholder="Your Name">
+
+        <input type="email"
+               class="form-control mb-3"
+               placeholder="Your Email">
+
+        <textarea class="form-control mb-3"
+                  rows="5"
+                  placeholder="Message"></textarea>
+
+        <button class="btn btn-primary w-100">
+            Send Message
+        </button>
+    </form>
+</div>
+{% endblock %}
