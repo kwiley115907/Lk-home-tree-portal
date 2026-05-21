@@ -150,58 +150,78 @@
 <body class="d-flex flex-column min-vh-100">
     <div class="background-logo"></div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center"
-               href="{{ url_for('dashboard') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}"
-                     alt="Logo">
-                LK Tree Services
-                
-            </a>
+    
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+    <div class="container d-flex align-items-center">
 
-            <div class="ms-auto">
-                
-                    <a href="{{ url_for('gallery') }}"
-                       class="btn btn-outline-light btn-sm me-2">
-                        Gallery
+        <a class="navbar-brand d-flex align-items-center gap-3"
+           href="{{ url_for('dashboard') }}">
+
+            <img src="{{ url_for('static', filename='images/logo.png') }}"
+                 alt="LK Tree Services Logo"
+                 class="main-logo">
+
+            <div class="brand-text">
+                <div class="brand-title">LK Tree Services</div>
+                <div class="brand-services">
+                    Tree Trimming | Uprooting | Prune & Lift | Take-Downs
+                </div>
+            </div>
+        </a>
+
+        <div class="ms-auto">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}"
+                   class="btn btn-outline-light btn-sm me-2">
+                    Dashboard
+                </a>
+
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('create_invoice') }}"
+                       class="btn btn-primary btn-sm me-2">
+                        New Invoice
                     </a>
 
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}"
+                    <a href="{{ url_for('invoice_list') }}"
                        class="btn btn-outline-light btn-sm me-2">
-                        Dashboard
+                        Invoices
                     </a>
 
-                    {% if current_user.is_admin %}
-                        <a href="{{ url_for('create_invoice') }}"
-                           class="btn btn-primary btn-sm me-2">
-                            New Invoice
-                        </a>
-                        <a href="{{ url_for('invoice_list') }}"
-                           class="btn btn-outline-light btn-sm me-2">
-                            Invoices
-                        </a>
+                    <a href="{{ url_for('estimate_list') }}"
+                       class="btn btn-outline-light btn-sm me-2">
+                        Estimates
+                    </a>
 
-                        <a href="{{ url_for('estimate_list') }}"
-                           class="btn btn-outline-light btn-sm me-2">
-                            Estimates
-                        </a>
-
-                        <a href="{{ url_for('analytics') }}"
-                           class="btn btn-outline-light btn-sm me-2">
-                            Analytics
-                        </a>
-                    {% endif %}
-
-                    <a href="{{ url_for('logout') }}"
-                       class="btn btn-danger btn-sm">
-                        Logout
+                    <a href="{{ url_for('analytics') }}"
+                       class="btn btn-outline-light btn-sm me-2">
+                        Analytics
                     </a>
                 {% endif %}
-            </div>
+
+                <a href="{{ url_for('gallery') }}"
+                   class="btn btn-outline-light btn-sm me-2">
+                    Gallery
+                </a>
+
+                <a href="{{ url_for('logout') }}"
+                   class="btn btn-danger btn-sm">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('gallery') }}"
+                   class="btn btn-outline-light btn-sm me-2">
+                    Gallery
+                </a>
+
+                <a href="{{ url_for('login') }}"
+                   class="btn btn-primary btn-sm">
+                    Login
+                </a>
+            {% endif %}
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <main class="container mt-5 flex-grow-1">
         {% block content %}{% endblock %}
