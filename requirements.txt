@@ -4,7 +4,8 @@ Flask-SQLAlchemy
 Werkzeug
 reportlab
 gunicorn
+stripe
 twilio
 Flask-WTF
+psycopg2-binary
 python-dotenv
-pg8000

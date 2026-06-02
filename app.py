@@ -1,7 +1,9 @@
 from datetime import datetime
+from dotenv import load_dotenv
 
 from flask import Flask, render_template, request, redirect, url_for, send_file
 import os
+from flask_wtf.csrf import CSRFProtect
 from flask_login import (
     LoginManager,
     login_user,
@@ -13,6 +15,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from config import Config
 from invoice_generator import generate_invoice_pdf
+load_dotenv()
+
 from models import db, User, ServiceRequest, Invoice, InvoiceItem, JobPhoto, Estimate
 
 
@@ -20,6 +24,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -444,11 +449,6 @@ def pay_invoice(invoice_id: int):
 @app.route("/invoice/<int:invoice_id>/paid")
 @login_required
 def mark_invoice_paid(invoice_id: int):
-    invoice = Invoice.query.get_or_404(invoice_id)
-    invoice.is_paid = True
-    invoice.payment_status = "Paid"
-    db.session.commit()
-
     return redirect(url_for("customer_invoices"))
 
 
@@ -559,6 +559,42 @@ def terms():
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
+
+
+
+@app.route("/stripe/webhook", methods=["POST"])
+@csrf.exempt
+def stripe_webhook():
+    import stripe
+
+    payload = request.data
+    signature = request.headers.get("Stripe-Signature")
+    webhook_secret = os.environ["STRIPE_WEBHOOK_SECRET"]
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload,
+            signature,
+            webhook_secret,
+        )
+    except ValueError:
+        return "Invalid payload", 400
+    except stripe.error.SignatureVerificationError:
+        return "Invalid signature", 400
+
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+        invoice = Invoice.query.filter_by(
+            stripe_session_id=session["id"]
+        ).first()
+
+        if invoice:
+            invoice.is_paid = True
+            invoice.payment_status = "Paid"
+            db.session.commit()
+
+    return "OK", 200
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@
 <h2>Create Service Request</h2>
 
 <form method="POST" action="{{ url_for('submit_request') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3">
         <label>Description</label>
         <textarea name="description" class="form-control" required></textarea>

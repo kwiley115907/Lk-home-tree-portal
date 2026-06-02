@@ -1,9 +1,8 @@
+.env
+instance/
+*.db
+*.sqlite3
 __pycache__/
 *.pyc
-instance/
-*.sqlite3
-*.db
-.env
 invoices/
-static/uploads/
 static/uploads/

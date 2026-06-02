@@ -12,6 +12,7 @@
     </canvas>
 
     <form method="POST" id="signature-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="signature_data" id="signature_data">
 
         <button type="button" class="btn btn-secondary mt-3" onclick="clearPad()">

@@ -19,6 +19,7 @@
     </div>
 
     <form>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text"
                class="form-control mb-3"
                placeholder="Your Name">

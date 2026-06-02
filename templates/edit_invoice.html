@@ -29,6 +29,7 @@
     <form method="POST"
           action="{{ url_for('schedule_invoice', invoice_id=invoice.id) }}"
           class="mb-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="datetime-local"
                name="scheduled_date"
                class="form-control mb-2"
@@ -55,6 +56,7 @@
     <h4>Add Line Item</h4>
 
     <form method="POST" class="row g-2 mb-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="col-md-6">
             <input type="text" name="description" placeholder="Description"
                    class="form-control" required>
