@@ -324,41 +324,6 @@ def analytics():
     )
 
 
-# =========================
-# PHOTO UPLOAD
-# =========================
-
-@app.route("/request/<int:request_id>/upload-photo", methods=["POST"])
-@login_required
-def upload_photo(request_id: int):
-    from werkzeug.utils import secure_filename
-
-    service_request = ServiceRequest.query.get_or_404(request_id)
-
-    if service_request.user_id != current_user.id and not current_user.is_admin:
-        return "Unauthorized", 403
-
-    file = request.files.get("photo")
-
-    if not file:
-        return "No file uploaded", 400
-
-    upload_folder = "static/uploads"
-    os.makedirs(upload_folder, exist_ok=True)
-
-    filename = secure_filename(file.filename)
-    save_path = os.path.join(upload_folder, filename)
-    file.save(save_path)
-
-    photo = JobPhoto(
-        filename=filename,
-        service_request_id=service_request.id,
-    )
-
-    db.session.add(photo)
-    db.session.commit()
-
-    return redirect(url_for("dashboard"))
 
 
 # =========================
