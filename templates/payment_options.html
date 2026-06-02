@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Payment Options{% endblock %}
+
+{% block content %}
+<div class="contractor-card mx-auto" style="max-width: 650px;">
+    <h2>Payment Options</h2>
+
+    <p><strong>Invoice:</strong> {{ invoice.invoice_number }}</p>
+    <p><strong>Client:</strong> {{ invoice.client_name }}</p>
+
+    <hr>
+
+    <p><strong>Subtotal:</strong> ${{ "%.2f"|format(subtotal) }}</p>
+    <p><strong>Tax:</strong> ${{ "%.2f"|format(tax) }}</p>
+    <h3 class="text-warning">Total: ${{ "%.2f"|format(total) }}</h3>
+
+    <hr>
+
+    {% if cashapp_url %}
+        <a href="{{ cashapp_url }}"
+           target="_blank"
+           class="btn btn-success w-100 mb-3">
+            Pay with Cash App
+        </a>
+    {% endif %}
+
+    {% if venmo_url %}
+        <a href="{{ venmo_url }}"
+           target="_blank"
+           class="btn btn-primary w-100 mb-3">
+            Pay with Venmo
+        </a>
+    {% endif %}
+
+    <p class="text-muted mt-3">
+        Please include invoice number {{ invoice.invoice_number }} in your payment note.
+    </p>
+</div>
+{% endblock %}

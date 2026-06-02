@@ -407,52 +407,6 @@ def convert_estimate(estimate_id: int):
 
 
 # =========================
-# STRIPE PAYMENTS
-# =========================
-
-@app.route("/invoice/<int:invoice_id>/pay")
-@login_required
-def pay_invoice(invoice_id: int):
-    import stripe
-
-    stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
-
-    invoice = Invoice.query.get_or_404(invoice_id)
-
-    subtotal = sum(item.quantity * item.rate for item in invoice.items)
-    tax = subtotal * invoice.tax_rate
-    total = subtotal + tax
-
-    session = stripe.checkout.Session.create(
-        mode="payment",
-        payment_method_types=["card"],
-        line_items=[
-            {
-                "price_data": {
-                    "currency": "usd",
-                    "product_data": {"name": invoice.invoice_number},
-                    "unit_amount": int(total * 100),
-                },
-                "quantity": 1,
-            }
-        ],
-        success_url=f"{os.environ.get('YOUR_DOMAIN', 'http://127.0.0.1:8000')}/invoice/{invoice.id}/paid",
-        cancel_url=f"{os.environ.get('YOUR_DOMAIN', 'http://127.0.0.1:8000')}/my-invoices",
-    )
-
-    invoice.stripe_session_id = session.id
-    db.session.commit()
-
-    return redirect(session.url)
-
-
-@app.route("/invoice/<int:invoice_id>/paid")
-@login_required
-def mark_invoice_paid(invoice_id: int):
-    return redirect(url_for("customer_invoices"))
-
-
-# =========================
 # SMS NOTIFICATIONS
 # =========================
 
@@ -563,38 +517,32 @@ def contact():
 
 
 
-@app.route("/stripe/webhook", methods=["POST"])
-@csrf.exempt
-def stripe_webhook():
-    import stripe
 
-    payload = request.data
-    signature = request.headers.get("Stripe-Signature")
-    webhook_secret = os.environ["STRIPE_WEBHOOK_SECRET"]
 
-    try:
-        event = stripe.Webhook.construct_event(
-            payload,
-            signature,
-            webhook_secret,
-        )
-    except ValueError:
-        return "Invalid payload", 400
-    except stripe.error.SignatureVerificationError:
-        return "Invalid signature", 400
 
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-        invoice = Invoice.query.filter_by(
-            stripe_session_id=session["id"]
-        ).first()
 
-        if invoice:
-            invoice.is_paid = True
-            invoice.payment_status = "Paid"
-            db.session.commit()
+@app.route("/invoice/<int:invoice_id>/payment-options")
+@login_required
+def payment_options(invoice_id: int):
+    invoice = Invoice.query.get_or_404(invoice_id)
 
-    return "OK", 200
+    if not current_user.is_admin and invoice.client_email != current_user.email:
+        return "Unauthorized", 403
+
+    subtotal = sum(item.quantity * item.rate for item in invoice.items)
+    tax = subtotal * invoice.tax_rate
+    total = subtotal + tax
+
+    return render_template(
+        "payment_options.html",
+        invoice=invoice,
+        subtotal=subtotal,
+        tax=tax,
+        total=total,
+        cashapp_url=os.environ.get("CASHAPP_URL"),
+        venmo_url=os.environ.get("VENMO_URL"),
+        apple_pay_note=os.environ.get("APPLE_PAY_NOTE"),
+    )
 
 
 if __name__ == "__main__":

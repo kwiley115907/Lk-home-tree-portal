@@ -10,7 +10,7 @@
             <tr>
                 <th>Invoice</th>
                 <th>Status</th>
-                <th>Pay</th>
+                <th>Payment Options</th>
                 <th>Sign</th>
             </tr>
         </thead>
@@ -21,7 +21,7 @@
                 <td>{{ invoice.payment_status }}</td>
                 <td>
                     {% if not invoice.is_paid %}
-                        <a href="{{ url_for('pay_invoice', invoice_id=invoice.id) }}"
+                        <a href="{{ url_for('payment_options', invoice_id=invoice.id) }}"
                            class="btn btn-primary btn-sm">
                             Pay
                         </a>
