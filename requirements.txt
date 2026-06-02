@@ -4,5 +4,7 @@ Flask-SQLAlchemy
 Werkzeug
 reportlab
 gunicorn
-stripe
 twilio
+Flask-WTF
+python-dotenv
+pg8000
