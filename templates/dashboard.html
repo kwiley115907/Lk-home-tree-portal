@@ -7,12 +7,18 @@
 
     <form method="POST" action="{{ url_for('submit_request') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <div class="mb-3">
             <label>Describe what you need done</label>
-            <textarea name="description" class="form-control" rows="5" required></textarea>
+            <textarea name="description"
+                      class="form-control"
+                      rows="5"
+                      required></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit Request</button>
+        <button type="submit" class="btn btn-primary">
+            Submit Request
+        </button>
     </form>
 </div>
 
@@ -27,6 +33,7 @@
                 <th>Status</th>
             </tr>
         </thead>
+
         <tbody>
         {% for request in requests %}
             <tr>
@@ -41,5 +48,10 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <a href="{{ url_for('customer_invoices') }}"
+       class="btn btn-outline-light mt-3">
+        View My Invoices
+    </a>
 </div>
 {% endblock %}

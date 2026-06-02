@@ -10,10 +10,11 @@
             <tr>
                 <th>Invoice</th>
                 <th>Status</th>
-                <th>Payment Options</th>
-                <th>Sign</th>
+                <th>Payment</th>
+                <th>Signature</th>
             </tr>
         </thead>
+
         <tbody>
         {% for invoice in invoices %}
             <tr>
@@ -23,10 +24,10 @@
                     {% if not invoice.is_paid %}
                         <a href="{{ url_for('payment_options', invoice_id=invoice.id) }}"
                            class="btn btn-primary btn-sm">
-                            Pay
+                            Payment Options
                         </a>
                     {% else %}
-                        Paid
+                        <span class="badge bg-success">Paid</span>
                     {% endif %}
                 </td>
                 <td>
