@@ -69,3 +69,11 @@ class InvoiceItem(db.Model):
     quantity = db.Column(db.Float, nullable=False)
     rate = db.Column(db.Float, nullable=False)
     invoice_id = db.Column(db.Integer, db.ForeignKey("invoice.id"))
+
+
+class GalleryJob(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), nullable=False)
+    before_image = db.Column(db.String(255), nullable=False)
+    after_image = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

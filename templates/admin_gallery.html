@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Manage Gallery{% endblock %}
+
+{% block content %}
+<div class="contractor-card">
+    <h2>Manage Before & After Gallery</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="mb-3">
+            <label>Job Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Before Photo</label>
+            <input type="file" name="before_image" class="form-control" accept="image/*" required>
+        </div>
+
+        <div class="mb-3">
+            <label>After Photo</label>
+            <input type="file" name="after_image" class="form-control" accept="image/*" required>
+        </div>
+
+        <button class="btn btn-primary">Add Before/After Photos</button>
+    </form>
+
+    <hr>
+
+    <h3>Current Gallery</h3>
+
+    <div class="gallery-grid">
+        {% for job in jobs %}
+        <div>
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="{{ url_for('static', filename=job.before_image) }}" alt="Before">
+                        <div class="photo-label">Before</div>
+                    </div>
+
+                    <div class="flip-card-back">
+                        <img src="{{ url_for('static', filename=job.after_image) }}" alt="After">
+                        <div class="photo-label">After</div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="mt-3 text-center">{{ job.title }}</h5>
+
+            <a href="{{ url_for('delete_gallery_job', job_id=job.id) }}"
+               class="btn btn-danger w-100"
+               onclick="return confirm('Delete this gallery item?');">
+                Delete
+            </a>
+        </div>
+        {% else %}
+            <p>No gallery photos uploaded yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

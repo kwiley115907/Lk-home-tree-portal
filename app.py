@@ -17,7 +17,7 @@ from config import Config
 from invoice_generator import generate_invoice_pdf
 load_dotenv()
 
-from models import db, User, ServiceRequest, Invoice, InvoiceItem, JobPhoto, Estimate
+from models import db, User, ServiceRequest, Invoice, InvoiceItem, JobPhoto, Estimate, GalleryJob
 
 
 app = Flask(__name__)
@@ -545,67 +545,92 @@ def payment_options(invoice_id: int):
     )
 
 
-if __name__ == "__main__":
-    app.run()
+
+
+# =========================
+# ADMIN GALLERY MANAGEMENT
+# =========================
+
+@app.route("/admin/gallery", methods=["GET", "POST"])
+@login_required
+def admin_gallery():
+    from werkzeug.utils import secure_filename
+
+    if not current_user.is_admin:
+        return "Unauthorized", 403
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        before_file = request.files.get("before_image")
+        after_file = request.files.get("after_image")
+
+        if not title or not before_file or not after_file:
+            return "Title, before image, and after image are required", 400
+
+        allowed = {"jpg", "jpeg", "png", "webp"}
+
+        def allowed_file(filename):
+            return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
+
+        if not allowed_file(before_file.filename) or not allowed_file(after_file.filename):
+            return "Only JPG, JPEG, PNG, or WEBP images allowed", 400
+
+        os.makedirs("static/gallery/before", exist_ok=True)
+        os.makedirs("static/gallery/after", exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+
+        before_name = secure_filename(f"{timestamp}_before_{before_file.filename}")
+        after_name = secure_filename(f"{timestamp}_after_{after_file.filename}")
+
+        before_path = os.path.join("static/gallery/before", before_name)
+        after_path = os.path.join("static/gallery/after", after_name)
+
+        before_file.save(before_path)
+        after_file.save(after_path)
+
+        gallery_job = GalleryJob(
+            title=title,
+            before_image=f"gallery/before/{before_name}",
+            after_image=f"gallery/after/{after_name}",
+        )
+
+        db.session.add(gallery_job)
+        db.session.commit()
+
+        return redirect(url_for("admin_gallery"))
+
+    jobs = GalleryJob.query.order_by(GalleryJob.created_at.desc()).all()
+    return render_template("admin_gallery.html", jobs=jobs)
+
+
+@app.route("/admin/gallery/<int:job_id>/delete")
+@login_required
+def delete_gallery_job(job_id: int):
+    if not current_user.is_admin:
+        return "Unauthorized", 403
+
+    job = GalleryJob.query.get_or_404(job_id)
+
+    before_path = os.path.join("static", job.before_image)
+    after_path = os.path.join("static", job.after_image)
+
+    for image_path in [before_path, after_path]:
+        if os.path.exists(image_path):
+            os.remove(image_path)
+
+    db.session.delete(job)
+    db.session.commit()
+
+    return redirect(url_for("admin_gallery"))
+
 
 @app.route("/gallery")
 def gallery():
-    jobs = [
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job1.jpg",
-            "after": "gallery/after/job1.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job2.jpg",
-            "after": "gallery/after/job2.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job4.jpg",
-            "after": "gallery/after/job4.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job5.jpg",
-            "after": "gallery/after/job5.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job6.jpg",
-            "after": "gallery/after/job6.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job7.jpg",
-            "after": "gallery/after/job7.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job8.jpg",
-            "after": "gallery/after/job8.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job9.jpg",
-            "after": "gallery/after/job9.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job10.jpg",
-            "after": "gallery/after/job10.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job11.jpg",
-            "after": "gallery/after/job11.jpg",
-        },
-        {
-            "title": "Palm Trim",
-            "before": "gallery/before/job12.jpg",
-            "after": "gallery/after/job12.jpg",
-        },
-    ]
-
+    jobs = GalleryJob.query.order_by(GalleryJob.created_at.desc()).all()
     return render_template("gallery.html", jobs=jobs)
+
+
+if __name__ == "__main__":
+    app.run()
+
